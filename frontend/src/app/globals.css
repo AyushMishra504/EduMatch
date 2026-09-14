@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-newsreader), Georgia, "Times New Roman", serif;
@@ -38,6 +40,23 @@
   to {
     transform: translateX(-50%);
   }
+}
+
+:root {
+  color-scheme: light;
+}
+
+.dark {
+  color-scheme: dark;
+  --color-paper: #141714;
+  --color-paper-deep: #1b1f1a;
+  --color-ink: #edf0e8;
+  --color-ink-muted: #a1a89b;
+  --color-rule: #2a2e27;
+  --color-accent: #3fb3a2;
+  --color-accent-deep: #2f9788;
+  --color-accent-tint: #1e2d29;
+  --color-on-accent: #071210;
 }
 
 html {

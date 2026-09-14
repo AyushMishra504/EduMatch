@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { Wordmark } from "@/components/Logo";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const SECTIONS = [
   { label: "For Educators", href: "#for-educators" },
@@ -35,6 +36,7 @@ export function Navbar() {
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
+          <ThemeToggle />
           <Link
             href="/login"
             className="rounded-md px-3 py-2 text-small font-semibold text-ink transition-colors hover:text-accent"
@@ -73,7 +75,8 @@ export function Navbar() {
                 {section.label}
               </a>
             ))}
-            <div className="mt-2 flex gap-2 border-t border-rule pt-3">
+            <div className="mt-2 flex items-center gap-2 border-t border-rule pt-3">
+              <ThemeToggle />
               <Link
                 href="/login"
                 onClick={() => setOpen(false)}
