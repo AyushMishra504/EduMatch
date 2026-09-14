@@ -8,6 +8,10 @@ export const app = express();
 app.use(cors({ origin: env.FRONTEND_URL }));
 app.use(express.json());
 
+app.get("/health", (_req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
 app.use("/api/health", healthRouter);
 
 app.use((_req, res) => {
