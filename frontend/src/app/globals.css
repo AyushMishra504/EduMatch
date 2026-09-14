@@ -35,6 +35,7 @@
 
   --animate-marquee: marquee 26s linear infinite;
   --animate-float: float 7s ease-in-out infinite;
+  --animate-caret: caret-blink 0.95s steps(2, start) infinite;
 
   --shadow-card: 0 1px 2px rgb(27 30 26 / 0.05),
     0 10px 24px -12px rgb(27 30 26 / 0.14);
@@ -77,6 +78,12 @@
   }
   50% {
     transform: translateY(-8px);
+  }
+}
+
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
   }
 }
 

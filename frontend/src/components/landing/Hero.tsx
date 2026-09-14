@@ -4,9 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import {
-  InteractiveHeroCard3D,
+  ProfileCard,
   type DossierView,
-} from "@/components/3d/InteractiveHeroCard3D";
+} from "@/components/landing/ProfileCard";
 
 function PersonaSwitch({
   view,
@@ -107,13 +107,12 @@ export function Hero() {
           </div>
 
           <p className="mt-6 text-tiny text-ink-muted">
-            Free to join. Educator and institution sign-up opens with the
-            launch.
+            Free to join. Sign in with Google and pick your path next.
           </p>
         </div>
 
         <div className="relative lg:col-span-5">
-          <InteractiveHeroCard3D view={view} />
+          <ProfileCard key={view} variant={view} />
         </div>
       </div>
     </section>

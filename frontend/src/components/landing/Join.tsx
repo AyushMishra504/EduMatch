@@ -19,8 +19,8 @@ export function Join() {
           Build the future of education with the right people.
         </h2>
         <p className="mt-5 max-w-md text-body text-on-accent/75">
-          Both paths open with the launch. Whichever side you&apos;re on, this
-          is where it starts.
+          Sign-up is open. Whichever side you&apos;re on, this is where it
+          starts.
         </p>
 
         <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">

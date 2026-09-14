@@ -16,6 +16,12 @@ jobs:
     defaults:
       run:
         working-directory: frontend
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+      AUTH_GOOGLE_ID: ${{ secrets.AUTH_GOOGLE_ID }}
+      AUTH_GOOGLE_SECRET: ${{ secrets.AUTH_GOOGLE_SECRET }}
+      AUTH_TRUST_HOST: "true"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,6 +33,8 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
       - name: Install dependencies
         run: npm ci
+      - name: Generate Prisma client
+        run: npx prisma generate
       - name: Lint
         run: npm run lint
       - name: Type check

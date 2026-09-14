@@ -17,7 +17,7 @@ const FAQ_ITEMS = [
   {
     question: "Is it live yet?",
     answer:
-      "Not yet. We're building and testing with the first institutions and educators, and sign-up opens with the launch.",
+      "Sign-up is open — create your account with Google today. Profiles, matching, and dashboards are rolling out, and early feedback decides what ships first.",
   },
   {
     question: "How does matching work?",
