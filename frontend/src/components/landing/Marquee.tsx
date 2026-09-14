@@ -1,9 +1,9 @@
 const ITEMS = [
-  "Qualified Educators",
-  "Verified Institutions",
-  "Smarter Faculty Discovery",
-  "Meaningful Academic Careers",
-  "Direct Connections",
+  "Built for UGC-style faculty hiring",
+  "ORCID & Scopus-ready dossiers",
+  "NIRF-aware role criteria",
+  "Confidential candidate search",
+  "Transparent pay-bands",
 ];
 
 export function Marquee() {

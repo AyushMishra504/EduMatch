@@ -34,6 +34,61 @@
   --text-tiny--line-height: 1.5;
 
   --animate-marquee: marquee 26s linear infinite;
+  --animate-float: float 7s ease-in-out infinite;
+
+  --shadow-card: 0 1px 2px rgb(27 30 26 / 0.05),
+    0 10px 24px -12px rgb(27 30 26 / 0.14);
+  --shadow-card-lg: 0 2px 4px rgb(27 30 26 / 0.06),
+    0 24px 48px -16px rgb(27 30 26 / 0.22);
+  --shadow-glow: 0 0 0 1px color-mix(in srgb, var(--color-accent) 40%, transparent),
+    0 12px 40px -8px color-mix(in srgb, var(--color-accent) 45%, transparent);
+}
+
+@utility preserve-3d {
+  transform-style: preserve-3d;
+}
+
+@utility perspective-1200 {
+  perspective: 1200px;
+}
+
+@utility glare {
+  background: radial-gradient(
+    520px circle at var(--glare-x, 50%) var(--glare-y, 0%),
+    rgb(255 255 255 / 0.18),
+    transparent 42%
+  );
+}
+
+@utility tilt {
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+}
+
+@utility glass {
+  background-color: color-mix(in srgb, var(--color-paper) 76%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes fadein {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes marquee {
@@ -48,15 +103,15 @@
 
 .dark {
   color-scheme: dark;
-  --color-paper: #141714;
-  --color-paper-deep: #1b1f1a;
-  --color-ink: #edf0e8;
-  --color-ink-muted: #a1a89b;
-  --color-rule: #2a2e27;
-  --color-accent: #3fb3a2;
-  --color-accent-deep: #2f9788;
-  --color-accent-tint: #1e2d29;
-  --color-on-accent: #071210;
+  --color-paper: #0a0a0a;
+  --color-paper-deep: #131313;
+  --color-ink: #ececec;
+  --color-ink-muted: #a0a0a0;
+  --color-rule: #262626;
+  --color-accent: #2e9e8e;
+  --color-accent-deep: #26816f;
+  --color-accent-tint: #14211f;
+  --color-on-accent: #08110f;
 }
 
 html {

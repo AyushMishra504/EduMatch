@@ -44,7 +44,11 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${jakarta.variable} ${newsreader.variable}`}>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${jakarta.variable} ${newsreader.variable}`}
+    >
       <body className="min-h-screen font-sans antialiased">
         <script
           dangerouslySetInnerHTML={{
