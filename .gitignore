@@ -11,3 +11,5 @@ out/
 dist/
 .eslintcache
 .md
+.chrome-cdp/
+cdp-repro*.js

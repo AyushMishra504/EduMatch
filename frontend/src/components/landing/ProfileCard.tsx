@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import {
   Briefcase,
@@ -107,7 +107,6 @@ const INST_STATES: PanelState[] = [
       "Profile shortlist",
       "Teaching demonstration",
       "Committee interview",
-      "Final offer",
     ],
     metaIcon: ListChecks,
     meta: "Three-stage selection",
@@ -120,7 +119,6 @@ const DELETE_MS = 28;
 const FADE_MS = 300;
 const STAGGER_MS = 150;
 const HOLD_MS = 2500;
-const MAX_DETAILS = 4;
 
 const clamp = (value: number, min: number, max: number) =>
   Math.max(min, Math.min(max, value));
@@ -138,14 +136,14 @@ function CyclingPanel({
   const [index, setIndex] = useState(0);
   const [phase, setPhase] = useState<Phase>("typing");
   const [paused, setPaused] = useState(false);
-  const elapsedRef = useRef(0);
-  const [, setFrame] = useState(0);
+  const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
     if (reduced) return;
     let raf = 0;
     let started = false;
     let last = 0;
+    let currentElapsed = 0;
     const loop = (now: number) => {
       raf = requestAnimationFrame(loop);
       if (paused) {
@@ -159,8 +157,7 @@ function CyclingPanel({
       }
       const dt = Math.min(now - last, 120);
       last = now;
-      elapsedRef.current += dt;
-      const e = elapsedRef.current;
+      currentElapsed += dt;
       const state = states[index];
       const headLen = state.heading.length;
       const detailCount = state.details.length;
@@ -168,14 +165,14 @@ function CyclingPanel({
       const revealEnd = typeEnd + detailCount * STAGGER_MS + FADE_MS;
       const holdEnd = revealEnd + HOLD_MS;
       const deleteEnd = holdEnd + headLen * DELETE_MS;
-      if (phase === "typing" && e >= holdEnd) {
+      if (phase === "typing" && currentElapsed >= holdEnd) {
         setPhase("deleting");
-      } else if (phase === "deleting" && e >= deleteEnd) {
-        elapsedRef.current = 0;
+      } else if (phase === "deleting" && currentElapsed >= deleteEnd) {
+        currentElapsed = 0;
         setPhase("typing");
         setIndex((current) => (current + 1) % states.length);
       }
-      setFrame((frame) => frame + 1);
+      setElapsed(currentElapsed);
     };
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
@@ -184,7 +181,7 @@ function CyclingPanel({
   const state = states[index];
   const headLen = state.heading.length;
   const detailCount = state.details.length;
-  const e = elapsedRef.current;
+  const e = elapsed;
   const typeEnd = WAIT_BEFORE_TYPE + headLen * TYPE_MS;
   const holdEnd = typeEnd + detailCount * STAGGER_MS + FADE_MS + HOLD_MS;
 
@@ -218,7 +215,7 @@ function CyclingPanel({
   const jumpTo = (target: number) => {
     setIndex(target);
     setPhase("typing");
-    elapsedRef.current = 0;
+    setElapsed(0);
   };
 
   const showCaret = !reduced && phase !== "hold";
@@ -270,10 +267,8 @@ function CyclingPanel({
         </h3>
       </div>
 
-      <ol className="mt-3 flex flex-col gap-y-1.5">
-        {Array.from({ length: MAX_DETAILS }, (_, detailIndex) => {
-          const detail =
-            detailIndex < detailCount ? state.details[detailIndex] : undefined;
+      <ol className="mt-3 flex min-h-[96px] flex-col gap-y-1.5">
+        {state.details.map((detail, detailIndex) => {
           const revealed = isRevealed(detailIndex);
           return (
             <li key={detailIndex} className="flex h-7 items-center gap-2">
@@ -284,18 +279,16 @@ function CyclingPanel({
                   transitionDelay: `${detailIndex * 100}ms`,
                 }}
               />
-              {detail && (
-                <span
-                  className={`text-small text-ink transition-[opacity,transform] duration-300 ${
-                    revealed
-                      ? "translate-y-0 opacity-100"
-                      : "translate-y-1 opacity-0"
-                  }`}
-                  style={{ transitionDelay: `${detailIndex * 100}ms` }}
-                >
-                  {detail}
-                </span>
-              )}
+              <span
+                className={`text-small text-ink transition-[opacity,transform] duration-300 ${
+                  revealed
+                    ? "translate-y-0 opacity-100"
+                    : "translate-y-1 opacity-0"
+                }`}
+                style={{ transitionDelay: `${detailIndex * 100}ms` }}
+              >
+                {detail}
+              </span>
             </li>
           );
         })}

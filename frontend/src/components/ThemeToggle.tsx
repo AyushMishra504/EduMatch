@@ -1,20 +1,23 @@
 "use client";
 
-import { useEffect, useSyncExternalStore } from "react";
-import { Monitor, Moon, Sun } from "lucide-react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
+import { Moon, Sun } from "lucide-react";
 import {
   applyTheme,
+  getSystemTheme,
   getThemeSnapshot,
-  setThemePreference,
+  setThemeWithTransition,
   subscribeTheme,
   type Theme,
 } from "@/lib/theme";
 
-const OPTIONS: { value: Theme; label: string; icon: typeof Monitor }[] = [
-  { value: "system", label: "Use system theme", icon: Monitor },
-  { value: "light", label: "Light theme", icon: Sun },
-  { value: "dark", label: "Dark theme", icon: Moon },
-];
+function resolveDark(): boolean {
+  const preference = getThemeSnapshot();
+  return (
+    preference === "dark" ||
+    (preference === "system" && getSystemTheme() === "dark")
+  );
+}
 
 export function ThemeToggle() {
   const preference = useSyncExternalStore<Theme>(
@@ -22,49 +25,53 @@ export function ThemeToggle() {
     getThemeSnapshot,
     () => "system",
   );
+  const isDark = useSyncExternalStore<boolean>(
+    subscribeTheme,
+    resolveDark,
+    () => false,
+  );
+  const btnRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     applyTheme(preference);
   }, [preference]);
 
-  const activeIndex = Math.max(
-    0,
-    OPTIONS.findIndex((option) => option.value === preference),
-  );
+  const handleClick = () => {
+    if (!btnRef.current) return;
+    setThemeWithTransition(isDark ? "light" : "dark", btnRef.current);
+  };
 
   return (
-    <div
-      role="radiogroup"
-      aria-label="Theme"
-      className="relative inline-flex items-stretch rounded-md border border-rule bg-paper-deep p-0.5"
+    <button
+      ref={btnRef}
+      type="button"
+      role="switch"
+      aria-checked={isDark}
+      aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
+      title={isDark ? "Switch to light theme" : "Switch to dark theme"}
+      onClick={handleClick}
+      className="relative grid h-8 w-9 place-items-center overflow-hidden rounded-md border border-rule bg-paper-deep text-ink-muted hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
     >
-      <span
+      <Sun
+        size={16}
+        strokeWidth={2}
         aria-hidden="true"
-        className="absolute inset-y-0.5 left-0.5 rounded-sm bg-paper shadow-sm transition-transform duration-300 ease-out"
-        style={{
-          width: "calc((100% - 4px) / 3)",
-          transform: `translateX(${activeIndex * 100}%)`,
-        }}
+        className={`absolute transition-all duration-300 ease-out ${
+          isDark
+            ? "rotate-90 scale-75 opacity-0 translate-y-1"
+            : "rotate-0 scale-100 opacity-100 translate-y-0"
+        }`}
       />
-      {OPTIONS.map((option, index) => {
-        const active = index === activeIndex;
-        return (
-          <button
-            key={option.value}
-            type="button"
-            role="radio"
-            aria-checked={active}
-            aria-label={option.label}
-            title={option.label}
-            onClick={() => setThemePreference(option.value)}
-            className={`relative grid h-8 w-9 place-items-center rounded-sm transition-colors ${
-              active ? "text-accent" : "text-ink-muted hover:text-ink"
-            }`}
-          >
-            <option.icon size={16} strokeWidth={2} aria-hidden="true" />
-          </button>
-        );
-      })}
-    </div>
+      <Moon
+        size={16}
+        strokeWidth={2}
+        aria-hidden="true"
+        className={`absolute transition-all duration-300 ease-out ${
+          isDark
+            ? "rotate-0 scale-100 opacity-100 translate-y-0"
+            : "-rotate-90 scale-75 opacity-0 -translate-y-1"
+        }`}
+      />
+    </button>
   );
 }

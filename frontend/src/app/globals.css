@@ -110,15 +110,15 @@
 
 .dark {
   color-scheme: dark;
-  --color-paper: #0a0a0a;
-  --color-paper-deep: #131313;
+  --color-paper: #000000;
+  --color-paper-deep: #0a0a0a;
   --color-ink: #ececec;
-  --color-ink-muted: #a0a0a0;
-  --color-rule: #262626;
-  --color-accent: #2e9e8e;
-  --color-accent-deep: #26816f;
-  --color-accent-tint: #14211f;
-  --color-on-accent: #08110f;
+  --color-ink-muted: #9b9e9c;
+  --color-rule: #1f1f1f;
+  --color-accent: #1f7f70;
+  --color-accent-deep: #186556;
+  --color-accent-tint: #0e1412;
+  --color-on-accent: #e8f5f2;
 }
 
 html {
@@ -133,4 +133,44 @@ body {
 ::selection {
   background: var(--color-accent);
   color: var(--color-on-accent);
+}
+
+/* Smooth theme transition — circular reveal from the toggle button */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 2;
+  /* Hidden until the reveal animation starts — prevents a flash of the new
+     theme while Chrome asynchronously runs the update callback. */
+  clip-path: circle(0px at 50% 50%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+/* Fallback smooth transition for browsers without View Transitions */
+html.theme-transition,
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+  transition: background-color 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+              color 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+              fill 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+              stroke 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transition-delay: 0s !important;
 }
