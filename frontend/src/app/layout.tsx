@@ -6,6 +6,8 @@ import {
   SITE_TAGLINE,
   SITE_URL,
 } from "@/lib/site";
+import { ScrollProgress } from "@/components/ScrollProgress";
+import { Providers } from "@/context/Providers";
 import "./globals.css";
 
 const jakarta = Plus_Jakarta_Sans({
@@ -50,12 +52,10 @@ export default function RootLayout({
       className={`${jakarta.variable} ${newsreader.variable}`}
     >
       <body className="min-h-screen font-sans antialiased">
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem("theme");var dark=t==="dark"||(t!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.classList.toggle("dark",dark)}catch(e){}})();`,
-          }}
-        />
-        {children}
+        <ScrollProgress />
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );

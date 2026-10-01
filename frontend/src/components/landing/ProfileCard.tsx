@@ -185,24 +185,7 @@ function CyclingPanel({
   const typeEnd = WAIT_BEFORE_TYPE + headLen * TYPE_MS;
   const holdEnd = typeEnd + detailCount * STAGGER_MS + FADE_MS + HOLD_MS;
 
-  let headingChars: number;
-  if (reduced) {
-    headingChars = headLen;
-  } else if (phase === "typing") {
-    headingChars = clamp(
-      Math.floor((e - WAIT_BEFORE_TYPE) / TYPE_MS) + 1,
-      0,
-      headLen,
-    );
-  } else if (phase === "deleting") {
-    headingChars = clamp(
-      headLen - Math.ceil((e - holdEnd) / DELETE_MS),
-      0,
-      headLen,
-    );
-  } else {
-    headingChars = headLen;
-  }
+
 
   const isRevealed = (detailIndex: number) => {
     if (reduced) return true;
@@ -218,7 +201,7 @@ function CyclingPanel({
     setElapsed(0);
   };
 
-  const showCaret = !reduced && phase !== "hold";
+
 
   return (
     <div
@@ -256,14 +239,8 @@ function CyclingPanel({
         </div>
         <h3 className="flex min-h-6 min-w-0 items-center text-tiny font-semibold uppercase tracking-[0.16em] text-ink-muted">
           <span className="truncate text-ink">
-            {state.heading.slice(0, headingChars)}
+            {state.heading}
           </span>
-          {showCaret && (
-            <span
-              aria-hidden="true"
-              className="animate-caret ml-0.5 inline-block h-[1.05em] w-px translate-y-[0.08em] bg-accent"
-            />
-          )}
         </h3>
       </div>
 

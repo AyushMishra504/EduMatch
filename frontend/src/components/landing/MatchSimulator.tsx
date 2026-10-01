@@ -111,8 +111,11 @@ export function MatchSimulator() {
   }, [discipline, level]);
 
   return (
-    <section id="match-sim" className="scroll-mt-16 border-t border-rule bg-paper-deep">
-      <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 lg:py-28">
+    <section id="match-sim" className="relative overflow-hidden scroll-mt-16 border-t border-rule bg-[#e3d8c8] dark:bg-[#241d17]">
+      {/* Spotlight Orb */}
+      <div className="pointer-events-none absolute left-[10%] top-[30%] h-[700px] w-[700px] rounded-full bg-accent/10 blur-[150px] animate-[orb-drift_20s_ease-in-out_infinite] mix-blend-screen" aria-hidden="true" />
+      
+      <div className="relative z-10 mx-auto max-w-6xl px-5 py-20 sm:px-8 lg:py-28">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-tiny font-semibold uppercase tracking-[0.18em] text-accent">
@@ -129,7 +132,7 @@ export function MatchSimulator() {
         </div>
 
         <div className="mt-12 grid items-start gap-10 lg:grid-cols-12">
-          <div className="space-y-7 rounded-md border border-rule bg-paper p-6 shadow-card sm:p-7 lg:col-span-7">
+          <div className="card-lift space-y-7 rounded-md border border-rule bg-paper p-6 shadow-card sm:p-7 lg:col-span-7 hover:border-accent/30 group">
             <Segmented
               label="Discipline"
               value={discipline}

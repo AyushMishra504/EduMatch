@@ -34,8 +34,18 @@
   --text-tiny--line-height: 1.5;
 
   --animate-marquee: marquee 26s linear infinite;
+  --animate-marquee-reverse: marquee-reverse 34s linear infinite;
   --animate-float: float 7s ease-in-out infinite;
   --animate-caret: caret-blink 0.95s steps(2, start) infinite;
+  --animate-slide-up: slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-fade-scale-in: fade-scale-in 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-slide-in-left: slide-in-left 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-slide-in-right: slide-in-right 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-shimmer: shimmer 2.4s linear infinite;
+  --animate-orb-drift: orb-drift 12s ease-in-out infinite;
+  --animate-orb-drift-slow: orb-drift-slow 18s ease-in-out infinite alternate;
+  --animate-nav-slide-down: nav-slide-down 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-stat-pop: stat-pop 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 
   --shadow-card: 0 1px 2px rgb(27 30 26 / 0.05),
     0 10px 24px -12px rgb(27 30 26 / 0.14);
@@ -43,6 +53,8 @@
     0 24px 48px -16px rgb(27 30 26 / 0.22);
   --shadow-glow: 0 0 0 1px color-mix(in srgb, var(--color-accent) 40%, transparent),
     0 12px 40px -8px color-mix(in srgb, var(--color-accent) 45%, transparent);
+  --shadow-glow-sm: 0 0 0 1px color-mix(in srgb, var(--color-accent) 25%, transparent),
+    0 6px 20px -4px color-mix(in srgb, var(--color-accent) 30%, transparent);
 }
 
 @utility preserve-3d {
@@ -71,38 +83,96 @@
   -webkit-backdrop-filter: blur(14px);
 }
 
+@utility dot-grid {
+  background-image: radial-gradient(var(--color-rule) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* ─── Keyframes ──────────────────────────────────────── */
+
 @keyframes float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
 }
 
 @keyframes caret-blink {
-  50% {
-    opacity: 0;
-  }
+  50% { opacity: 0; }
 }
 
 @keyframes fadein {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes marquee {
-  to {
-    transform: translateX(-50%);
-  }
+  to { transform: translateX(-50%); }
 }
+
+@keyframes marquee-reverse {
+  from { transform: translateX(-50%); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-scale-in {
+  from { opacity: 0; transform: scale(0.94) translateY(14px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateX(-32px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(32px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes orb-drift {
+  0%   { transform: translate(0, 0) scale(1); }
+  33%  { transform: translate(18px, -22px) scale(1.05); }
+  66%  { transform: translate(-14px, 10px) scale(0.97); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+@keyframes orb-drift-slow {
+  0%   { transform: translate(0, 0) scale(1) rotate(0deg); }
+  50%  { transform: translate(-22px, 16px) scale(1.07) rotate(8deg); }
+  100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+}
+
+@keyframes shimmer {
+  from { background-position: 200% center; }
+  to   { background-position: -200% center; }
+}
+
+@keyframes nav-slide-down {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes stat-pop {
+  from { opacity: 0; transform: translateY(10px) scale(0.9); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes gradient-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes line-grow {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+
+/* ─── Base ───────────────────────────────────────────── */
 
 :root {
   color-scheme: light;
@@ -135,7 +205,109 @@ body {
   color: var(--color-on-accent);
 }
 
-/* Smooth theme transition — circular reveal from the toggle button */
+/* ─── Scroll Progress Bar ────────────────────────────── */
+
+#scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 100;
+  transform-origin: left;
+  transform: scaleX(var(--scroll-progress, 0));
+  background: linear-gradient(
+    90deg,
+    var(--color-accent),
+    color-mix(in srgb, var(--color-accent) 60%, #22d3b8)
+  );
+  transition: transform 0.08s linear;
+}
+
+/* ─── InView animation helpers ───────────────────────── */
+
+[data-inview] {
+  opacity: 0;
+}
+
+[data-inview].in-view {
+  opacity: 1;
+}
+
+[data-inview="slide-up"].in-view {
+  animation: var(--animate-slide-up);
+}
+
+[data-inview="fade-scale"].in-view {
+  animation: var(--animate-fade-scale-in);
+}
+
+[data-inview="slide-left"].in-view {
+  animation: var(--animate-slide-in-left);
+}
+
+[data-inview="slide-right"].in-view {
+  animation: var(--animate-slide-in-right);
+}
+
+/* ─── Shimmer gradient text ──────────────────────────── */
+
+.shimmer-text {
+  background: linear-gradient(
+    90deg,
+    var(--color-ink) 0%,
+    var(--color-accent) 30%,
+    color-mix(in srgb, var(--color-accent) 70%, #22d3b8) 50%,
+    var(--color-accent) 70%,
+    var(--color-ink) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: var(--animate-shimmer);
+}
+
+/* ─── Underline reveal on inView ─────────────────────── */
+
+.heading-underline {
+  position: relative;
+  display: inline-block;
+}
+
+.heading-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 2px;
+  background: var(--color-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.3s;
+}
+
+[data-inview].in-view .heading-underline::after,
+.heading-underline.in-view::after {
+  transform: scaleX(1);
+}
+
+/* ─── Card hover lift ────────────────────────────────── */
+
+.card-lift {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.2s ease;
+}
+
+.card-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card-lg);
+}
+
+/* ─── Smooth theme transition ────────────────────────── */
+
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
@@ -148,8 +320,6 @@ body {
 
 ::view-transition-new(root) {
   z-index: 2;
-  /* Hidden until the reveal animation starts — prevents a flash of the new
-     theme while Chrome asynchronously runs the update callback. */
   clip-path: circle(0px at 50% 50%);
 }
 
@@ -158,6 +328,21 @@ body {
   ::view-transition-old(*),
   ::view-transition-new(*) {
     animation: none !important;
+  }
+
+  [data-inview] {
+    opacity: 1 !important;
+    animation: none !important;
+  }
+
+  .shimmer-text {
+    animation: none;
+    -webkit-text-fill-color: var(--color-ink);
+    background: none;
+  }
+
+  #scroll-progress {
+    display: none;
   }
 }
 
