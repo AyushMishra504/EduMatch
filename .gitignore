@@ -13,3 +13,12 @@ dist/
 .md
 .chrome-cdp/
 cdp-repro*.js
+
+# resume-parser (Python service)
+resume-parser/.venv/
+resume-parser/.artifacts/
+resume-parser/**/__pycache__/
+.pytest_cache/
+
+# tooling metadata
+.freebuff/

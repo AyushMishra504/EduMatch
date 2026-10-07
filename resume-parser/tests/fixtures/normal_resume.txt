@@ -1,0 +1,38 @@
+AYUSH MISHRA
+ayush.mishra@example.com
++91 98765 43210
+Pune, Maharashtra
+linkedin.com/in/ayushmishra
+github.com/ayushmishra
+ORCID: 0000-0002-1825-0097
+
+EDUCATION
+Manipal Institute of Technology
+B.Tech, Computer Science
+2022 - 2026 | CGPA: 8.7/10
+
+St. Xavier's College
+B.Sc, Physics
+2018 - 2021 | 82%
+
+EXPERIENCE
+Software Engineering Intern
+Google India
+May 2025 - July 2025
+- Built internal dashboards used by 40+ analysts
+- Improved dashboard query latency by 35%
+
+Research Assistant | IIT Bombay | Jan 2024 - Apr 2024
+- Assisted with machine learning lab coursework
+
+SKILLS
+Python, React, Node.js, PostgreSQL, Git, Docker, Machine Learning
+
+PROJECTS
+NeuroSense
+Multimodal Parkinson's detection using handwriting, voice and MRI.
+Python, SVM, HOG, scikit-learn
+
+CERTIFICATIONS
+AWS Certified Cloud Practitioner - Amazon Web Services
+Qualified UGC-NET in 2023

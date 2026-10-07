@@ -1,0 +1,8 @@
+Jane Doe
+jane@example.com
+
+EDUCATION
+Manipal Institute of Technology
+
+SKILLS
+Python, React, SQL
