@@ -13,6 +13,85 @@ enum Role {
   INSTITUTION
 }
 
+enum ProfileVisibility {
+  DRAFT
+  PUBLISHED
+}
+
+enum HighestDegree {
+  BACHELORS
+  MASTERS
+  MPHIL
+  PHD
+  POSTDOC
+}
+
+enum PhdStatus {
+  NONE
+  PURSUING
+  SUBMITTED
+  AWARDED
+}
+
+enum Discipline {
+  COMPUTER_SCIENCE
+  INFORMATION_TECHNOLOGY
+  ELECTRONICS
+  ELECTRICAL
+  MECHANICAL
+  CIVIL
+  CHEMICAL
+  BIOTECHNOLOGY
+  MATHEMATICS
+  PHYSICS
+  CHEMISTRY
+  BOTANY
+  ZOOLOGY
+  ECONOMICS
+  COMMERCE
+  MANAGEMENT
+  ENGLISH
+  HINDI
+  HISTORY
+  POLITICAL_SCIENCE
+  SOCIOLOGY
+  PSYCHOLOGY
+  EDUCATION
+  LAW
+}
+
+enum Eligibility {
+  UGC_NET
+  CSIR_NET
+  SET_SLET
+  JRF
+  GATE
+  NONE
+}
+enum FacultyLevel {
+  GUEST
+  VISITING
+  ASSISTANT_PROFESSOR
+  ASSOCIATE_PROFESSOR
+  PROFESSOR
+  HOD
+}
+enum EmploymentType {
+  FULL_TIME
+  CONTRACT
+  VISITING
+  PART_TIME
+}
+enum UgcPayLevel {
+  LEVEL_10
+  LEVEL_11
+  LEVEL_12
+  LEVEL_13A
+  LEVEL_14
+  CONSOLIDATED
+  NEGOTIABLE
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -25,6 +104,79 @@ model User {
 
   accounts Account[]
   sessions Session[]
+  educatorProfile EducatorProfile?
+}
+
+model EducatorProfile {
+  id String @id @default(cuid())
+  userId String @unique
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  phone String?
+  city String?
+  state String?
+  willingToRelocate Boolean @default(false)
+  headline String?
+  bio String?
+  highestDegree HighestDegree?
+  phdStatus PhdStatus?
+  discipline Discipline?
+  specializations String[] @default([])
+  eligibility Eligibility[] @default([])
+  isFresher Boolean @default(false)
+  teachingYears Int?
+  industryYears Int?
+  currentInstitution String?
+  currentDesignation String?
+  noticePeriodDays Int?
+  publicationsCount Int?
+  orcidId String?
+  scopusId String?
+  hIndex Int?
+  desiredLevels FacultyLevel[] @default([])
+  employmentTypes EmploymentType[] @default([])
+  preferredLocations String[] @default([])
+  expectedPayLevel UgcPayLevel?
+  resumeUrl String?
+  resumeFilename String?
+  visibility ProfileVisibility @default(DRAFT)
+  completedSteps Int @default(0)
+  publishedAt DateTime?
+  education EducationEntry[]
+  experience ExperienceEntry[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([visibility, discipline])
+}
+
+model EducationEntry {
+  id String @id @default(cuid())
+  profileId String
+  profile EducatorProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  degree HighestDegree
+  field String
+  institution String
+  startYear Int
+  endYear Int?
+  isOngoing Boolean @default(false)
+  grade String?
+  sortOrder Int @default(0)
+  @@index([profileId])
+}
+
+model ExperienceEntry {
+  id String @id @default(cuid())
+  profileId String
+  profile EducatorProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  designation String
+  institution String
+  startYear Int
+  startMonth Int
+  endYear Int?
+  endMonth Int?
+  isCurrent Boolean @default(false)
+  subjects String[] @default([])
+  sortOrder Int @default(0)
+  @@index([profileId])
 }
 
 model Account {

@@ -30,7 +30,7 @@ function SubmitButton({ selected }: { selected: string | null }) {
       disabled={!selected || pending}
       className="mt-8 h-11 w-full rounded-md bg-accent text-small font-semibold text-on-accent transition-colors hover:bg-accent-deep disabled:cursor-not-allowed disabled:opacity-50"
     >
-      {pending ? "Saving…" : "Start building your profile"}
+      {pending ? "Saving…" : "Continue"}
     </button>
   );
 }

@@ -1,101 +1,88 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
 
 const FAQ_ITEMS = [
   {
-    question: "What is EduMatch?",
+    id: "faq-1",
+    question: "Can I upload my CV?",
     answer:
-      "EduMatch connects educators with institutions for teaching and research roles in India. It's a place for one clear profile, matched roles, and open applications.",
+      "Yes. Upload a PDF or Word file and we'll help you build your profile. You can review and edit everything.",
   },
   {
-    question: "Who is it for?",
+    id: "faq-2",
+    question: "Is it free for educators?",
     answer:
-      "Educators — from early-career researchers to experienced faculty — and institutions hiring for teaching and research positions.",
+      "Yes. Creating a profile and reviewing matches is completely free for educators.",
   },
   {
-    question: "Is it live yet?",
+    id: "faq-3",
+    question: "Who can see my profile?",
     answer:
-      "Sign-up is open — create your account with Google today. Profiles, matching, and dashboards are rolling out, and early feedback decides what ships first.",
+      "You control visibility. Your profile is private by default and only shared when you choose to connect with an institution.",
   },
   {
-    question: "How does matching work?",
+    id: "faq-4",
+    question: "Do I need to fill everything in to start?",
     answer:
-      "Profiles are matched to roles by discipline, experience, and the preferences you set. You stay in control of your profile and what's visible to institutions.",
+      "No. You can start with your CV or basic answers, and add more details whenever you're ready.",
   },
   {
-    question: "What does it cost?",
+    id: "faq-5",
+    question: "Is EduMatch live yet?",
     answer:
-      "It's free for educators and institutions. If paid features come later, we'll be clear about them before anything changes.",
-  },
-  {
-    question: "How can I help shape it?",
-    answer:
-      "Reach out through the Join section and tell us what you'd like built. Early feedback decides what ships first.",
+      "We are currently onboarding founding educators across India. Matching roles go live in the upcoming academic hiring cycle.",
   },
 ];
 
 export function Faq() {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [openId, setOpenId] = useState<string | null>("faq-1");
 
   return (
-    <section id="faq" className="scroll-mt-16 border-t border-rule">
-      <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 lg:py-24">
-        <div className="grid gap-10 lg:grid-cols-12">
-          <div className="lg:col-span-4">
-            <p className="text-tiny font-semibold uppercase tracking-[0.18em] text-accent">
-              FAQ
-            </p>
-            <h2 className="mt-4 font-serif font-medium text-h2 text-ink">
-              Questions, answered plainly.
-            </h2>
-            <p className="mt-4 max-w-sm text-body text-ink-muted">
-              Something else on your mind? Every answer updates as the product
-              ships.
-            </p>
-          </div>
+    <section
+      id="faq"
+      className="scroll-mt-20 border-b border-[#E5E7EB] bg-[#FAFAFA] py-28 dark:border-[#1F1F1F] dark:bg-[#0A0A0A] lg:py-36"
+    >
+      <div className="mx-auto max-w-6xl px-6">
+        <h2 className="mb-12 font-serif text-[38px] font-normal tracking-tight text-[#09090B] dark:text-white sm:text-[44px]">
+          Questions, answered{" "}
+          <em className="font-normal italic text-[#1F8F7E]">plainly.</em>
+        </h2>
 
-          <div className="lg:col-span-7 lg:col-start-6">
-            <div className="border-t border-rule">
-              {FAQ_ITEMS.map((item, index) => {
-                const isOpen = openIndex === index;
-                return (
-                  <div key={item.question} className="border-b border-rule">
-                    <button
-                      type="button"
-                      onClick={() => setOpenIndex(isOpen ? null : index)}
-                      aria-expanded={isOpen}
-                      className="flex w-full items-center justify-between gap-4 py-5 text-left"
-                    >
-                      <h3 className="font-serif text-h3 font-medium text-ink">
-                        {item.question}
-                      </h3>
-                      <ChevronDown
-                        size={18}
-                        className={`shrink-0 text-ink-muted transition-transform duration-300 ease-out ${
-                          isOpen ? "rotate-180" : ""
-                        }`}
-                      />
-                    </button>
-                    <div
-                      className={`grid transition-all duration-300 ease-out ${
-                        isOpen
-                          ? "grid-rows-[1fr] opacity-100"
-                          : "grid-rows-[0fr] opacity-0"
-                      }`}
-                    >
-                      <div className="overflow-hidden">
-                        <p className="max-w-xl pb-5 text-body text-ink-muted">
-                          {item.answer}
-                        </p>
-                      </div>
-                    </div>
+        <div className="divide-y divide-[#E5E7EB] border-t border-[#E5E7EB] dark:divide-[#1F1F1F] dark:border-[#1F1F1F]">
+          {FAQ_ITEMS.map((item) => {
+            const isOpen = openId === item.id;
+            return (
+              <div key={item.id} className="py-5">
+                <button
+                  type="button"
+                  onClick={() => setOpenId(isOpen ? null : item.id)}
+                  aria-expanded={isOpen}
+                  aria-controls={item.id}
+                  className="group flex w-full items-center justify-between text-left focus:outline-none"
+                >
+                  <span className="text-lg font-medium text-[#09090B] transition-colors group-hover:text-[#1F8F7E] dark:text-white dark:group-hover:text-white">
+                    {item.question}
+                  </span>
+                  <span
+                    id={`${item.id}-icon`}
+                    aria-hidden="true"
+                    className="ml-4 select-none text-xl font-light text-[#71717A]"
+                  >
+                    {isOpen ? "−" : "+"}
+                  </span>
+                </button>
+                {isOpen ? (
+                  <div
+                    id={item.id}
+                    className="max-w-3xl pt-3 text-base leading-relaxed text-[#52525B] dark:text-[#A1A1AA]"
+                  >
+                    {item.answer}
                   </div>
-                );
-              })}
-            </div>
-          </div>
+                ) : null}
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

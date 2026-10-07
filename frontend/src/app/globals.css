@@ -36,6 +36,10 @@
   --animate-marquee: marquee 26s linear infinite;
   --animate-float: float 7s ease-in-out infinite;
   --animate-caret: caret-blink 0.95s steps(2, start) infinite;
+  --animate-fadein: fadein 0.25s ease-out;
+  --animate-rise: rise-in 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-pop: pop-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-sweep: sweep 14s ease-in-out infinite;
 
   --shadow-card: 0 1px 2px rgb(27 30 26 / 0.05),
     0 10px 24px -12px rgb(27 30 26 / 0.14);
@@ -104,6 +108,110 @@
   }
 }
 
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.82);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes sweep {
+  0%,
+  100% {
+    opacity: 0.75;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate3d(2%, -3%, 0) scale(1.06);
+  }
+}
+
+/* Landing-page textures adapted from the Stitch redesign. */
+.hero-dot-grid {
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--color-ink) 14%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 24px 24px;
+}
+
+/* Scroll reveal — toggled by the <Reveal> component so the content is never
+   hidden behind a scroll-driven animation, and stays visible without JS. */
+[data-reveal] {
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-reveal="out"] {
+  opacity: 0;
+  transform: translateY(22px);
+}
+
+[data-reveal="in"] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Soft mint aurora behind the hero, matching the Stitch artwork. */
+.hero-aurora {
+  background:
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-accent) 10%, transparent),
+      transparent 62%
+    ),
+    radial-gradient(
+      58% 62% at 76% 46%,
+      color-mix(in srgb, var(--color-accent) 22%, transparent),
+      transparent 72%
+    );
+}
+
+.dark .hero-aurora {
+  background:
+    radial-gradient(
+      72% 74% at 60% 46%,
+      color-mix(in srgb, var(--color-accent) 88%, transparent),
+      transparent 74%
+    ),
+    radial-gradient(
+      78% 66% at 24% 10%,
+      color-mix(in srgb, var(--color-accent) 42%, transparent),
+      transparent 74%
+    );
+}
+
+.minimal-card {
+  border: 1px solid #1f1f1f;
+  box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.06);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.minimal-card:hover {
+  transform: translateY(-4px);
+}
+
 :root {
   color-scheme: light;
 }
@@ -158,6 +266,18 @@ body {
   ::view-transition-old(*),
   ::view-transition-new(*) {
     animation: none !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+  /* Entrance animations are decorative only — never gate the content behind
+     them when a visitor asks for reduced motion. */
+  [class*="animate-"] {
+    animation: none !important;
+    animation-timeline: auto !important;
   }
 }
 

@@ -1,118 +1,71 @@
-"use client";
-
-import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
-import {
-  ProfileCard,
-  type DossierView,
-} from "@/components/landing/ProfileCard";
+import { Check } from "lucide-react";
+import { GooglePillButton } from "@/components/GoogleSignInButton";
+import { CampusVisual } from "@/components/landing/CampusVisual";
 
-function PersonaSwitch({
-  view,
-  onChange,
-}: {
-  view: DossierView;
-  onChange: (value: DossierView) => void;
-}) {
-  const options: { value: DossierView; label: string }[] = [
-    { value: "educator", label: "I’m an Educator" },
-    { value: "institution", label: "I’m an Institution" },
-  ];
-
-  return (
-    <div
-      className="inline-flex items-center gap-1 rounded-md border border-rule bg-paper-deep p-1"
-      role="group"
-      aria-label="Choose who you are"
-    >
-      {options.map(({ value, label }) => (
-        <button
-          key={value}
-          type="button"
-          aria-pressed={view === value}
-          onClick={() => onChange(value)}
-          className={`rounded-sm px-3 py-1.5 text-tiny font-semibold transition-colors ${
-            view === value
-              ? "bg-paper text-accent shadow-sm"
-              : "text-ink-muted hover:text-ink"
-          }`}
-        >
-          {label}
-        </button>
-      ))}
-    </div>
-  );
-}
+const ASSURANCES = [
+  "Upload your CV or fill a short form",
+  "Edit anything",
+  "You choose who sees it",
+];
 
 export function Hero() {
-  const [view, setView] = useState<DossierView>("educator");
-  const educatorFirst = view === "educator";
-
   return (
-    <section className="relative overflow-hidden">
-      <div className="relative mx-auto grid max-w-6xl grid-cols-1 gap-14 px-5 pb-20 pt-14 sm:px-8 lg:grid-cols-12 lg:min-h-[82vh] lg:items-center lg:gap-10 lg:pb-24 lg:pt-20">
-        <div className="lg:col-span-7">
-          <p className="text-tiny font-semibold uppercase tracking-[0.18em] text-accent">
-            For educators &amp; institutions in Indian higher education
-          </p>
+    <section className="hero-dot-grid relative overflow-hidden border-b border-[#E5E7EB] bg-white dark:border-[#1F1F1F]/60 dark:bg-black">
+      <div
+        className="hero-aurora pointer-events-none absolute inset-0 motion-reduce:animate-none animate-sweep"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-[70%] bg-gradient-to-b from-white/85 to-transparent dark:from-transparent"
+        aria-hidden="true"
+      />
 
-          <h1 className="mt-5 font-serif font-medium text-display text-ink">
-            Where India’s faculties find each other.
+      <div className="relative z-10 mx-auto grid max-w-6xl grid-cols-1 items-center gap-14 px-6 pb-28 pt-20 lg:grid-cols-12 lg:gap-14 lg:pb-32 lg:pt-28">
+        <div className="flex flex-col items-start lg:col-span-7">
+          <span className="motion-reduce:animate-none animate-rise mb-6 inline-flex items-center rounded-full border border-[#1F8F7E]/30 bg-[#1F8F7E]/10 px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#12796B] dark:border-transparent dark:bg-transparent dark:px-0 dark:py-0 dark:text-[#1F8F7E]">
+            For faculty and educators in India
+          </span>
+          <h1 className="motion-reduce:animate-none animate-rise mb-8 font-serif text-[46px] font-normal leading-[1.06] tracking-tight text-[#09090B] [animation-delay:80ms] sm:text-[58px] lg:text-[66px] dark:text-white">
+            The right faculty role,{" "}
+            <span className="font-normal italic text-[#12796B] dark:text-[#1F8F7E]">
+              matched to you.
+            </span>
           </h1>
-
-          <p className="mt-6 max-w-xl text-lead text-ink-muted">
-            EduMatch pairs educators and universities on teaching, research,
-            and fit — one academic profile, matched to the roles that actually
-            suit you. Built with Indian higher-ed hiring norms in mind.
+          <p className="motion-reduce:animate-none animate-rise mb-9 max-w-xl text-[17px] font-normal leading-relaxed text-[#52525B] [animation-delay:160ms] sm:text-[18px] dark:text-[#A1A1AA]">
+            EduMatch connects educators with universities across India. Build
+            one academic profile, or upload your CV, and see the roles that
+            fit.
           </p>
 
-          <div className="mt-8">
-            <PersonaSwitch view={view} onChange={setView} />
+          <div className="motion-reduce:animate-none animate-rise [animation-delay:240ms]">
+            <GooglePillButton />
           </div>
 
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <Link
-              href="#for-educators"
-              className={`group inline-flex items-center justify-center gap-2 rounded-md px-5 py-3 text-small font-semibold transition-colors ${
-                educatorFirst
-                  ? "bg-accent text-on-accent hover:bg-accent-deep"
-                  : "border border-rule bg-transparent text-ink hover:border-accent hover:text-accent"
-              }`}
-            >
-              Find Teaching Opportunities
-              {educatorFirst && (
-                <ArrowRight
-                  size={16}
-                  className="transition-transform group-hover:translate-x-0.5"
+          <div className="motion-reduce:animate-none animate-rise mt-6 flex flex-wrap items-center gap-x-7 gap-y-2.5 text-[14px] text-[#4B5563] [animation-delay:320ms] dark:text-[#A1A1AA]">
+            {ASSURANCES.map((assurance) => (
+              <span key={assurance} className="inline-flex items-center gap-2">
+                <Check
+                  size={15}
+                  strokeWidth={2.5}
+                  aria-hidden="true"
+                  className="shrink-0 text-[#1F8F7E]"
                 />
-              )}
-            </Link>
-            <Link
-              href="#for-institutions"
-              className={`group inline-flex items-center justify-center rounded-md px-5 py-3 text-small font-semibold transition-colors ${
-                educatorFirst
-                  ? "border border-rule bg-transparent text-ink hover:border-accent hover:text-accent"
-                  : "bg-accent text-on-accent hover:bg-accent-deep"
-              }`}
-            >
-              Hire Qualified Educators
-              {!educatorFirst && (
-                <ArrowRight
-                  size={16}
-                  className="transition-transform group-hover:translate-x-0.5"
-                />
-              )}
-            </Link>
+                {assurance}
+              </span>
+            ))}
           </div>
 
-          <p className="mt-6 text-tiny text-ink-muted">
-            Free to join. Sign in with Google and pick your path next.
-          </p>
+          <Link
+            href="/signup"
+            className="motion-reduce:animate-none animate-rise mt-9 inline-block text-[15px] font-medium text-[#374151] transition-colors [animation-delay:400ms] hover:text-[#09090B] dark:text-[#A1A1AA] dark:hover:text-white"
+          >
+            Hiring faculty? Get early access →
+          </Link>
         </div>
 
-        <div className="relative lg:col-span-5">
-          <ProfileCard key={view} variant={view} />
+        <div className="flex justify-center lg:col-span-5">
+          <CampusVisual />
         </div>
       </div>
     </section>

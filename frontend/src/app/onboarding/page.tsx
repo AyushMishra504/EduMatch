@@ -19,7 +19,10 @@ export default async function OnboardingPage() {
     select: { role: true },
   });
 
-  if (user?.role !== "UNSET") redirect("/dashboard");
+  // Roles are decided once; the minimal screen (/onboarding/educator/start)
+  // is only reachable through setRole's redirect, so a returning user lands
+  // straight in the product.
+  if (user && user.role !== "UNSET") redirect("/dashboard");
 
   return (
     <>

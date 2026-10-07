@@ -50,16 +50,17 @@ export function ThemeToggle() {
       aria-label={isDark ? "Switch to light theme" : "Switch to dark theme"}
       title={isDark ? "Switch to light theme" : "Switch to dark theme"}
       onClick={handleClick}
-      className="relative grid h-8 w-9 place-items-center overflow-hidden rounded-md border border-rule bg-paper-deep text-ink-muted hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+      className="relative grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full border border-[#E5E7EB] bg-[#F4F4F5] text-[#52525B] transition-colors hover:text-[#09090B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1F8F7E]/60 dark:border-[#1F1F1F] dark:bg-[#0A0A0A] dark:text-[#A1A1AA] dark:hover:text-white"
     >
+      {/* The glyph previews the theme the button switches to. */}
       <Sun
         size={16}
         strokeWidth={2}
         aria-hidden="true"
         className={`absolute transition-all duration-300 ease-out ${
           isDark
-            ? "rotate-90 scale-75 opacity-0 translate-y-1"
-            : "rotate-0 scale-100 opacity-100 translate-y-0"
+            ? "rotate-0 scale-100 opacity-100 translate-y-0"
+            : "-rotate-90 scale-75 opacity-0 -translate-y-1"
         }`}
       />
       <Moon
@@ -68,8 +69,8 @@ export function ThemeToggle() {
         aria-hidden="true"
         className={`absolute transition-all duration-300 ease-out ${
           isDark
-            ? "rotate-0 scale-100 opacity-100 translate-y-0"
-            : "-rotate-90 scale-75 opacity-0 -translate-y-1"
+            ? "rotate-90 scale-75 opacity-0 translate-y-1"
+            : "rotate-0 scale-100 opacity-100 translate-y-0"
         }`}
       />
     </button>

@@ -11,9 +11,9 @@ export async function setRole(formData: FormData) {
   const role = formData.get("role");
   if (role !== "EDUCATOR" && role !== "INSTITUTION") return;
 
-  await prisma.user.update({
-    where: { id: session.user.id },
-    data: { role },
+  await prisma.$transaction(async (tx) => {
+    await tx.user.update({ where: { id: session.user.id }, data: { role } });
+    if (role === "EDUCATOR") await tx.educatorProfile.upsert({ where: { userId: session.user.id }, create: { userId: session.user.id }, update: {} });
   });
-  redirect("/dashboard");
+  redirect(role === "EDUCATOR" ? "/onboarding/educator/start" : "/dashboard");
 }

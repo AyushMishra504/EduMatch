@@ -16,5 +16,5 @@ export default auth((request: NextAuthRequest) => {
 });
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/onboarding"],
+  matcher: ["/dashboard/:path*", "/onboarding/:path*", "/profile/:path*"],
 };

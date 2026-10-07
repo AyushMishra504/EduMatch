@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Navbar } from "@/components/landing/Navbar";
 import { Footer } from "@/components/landing/Footer";
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
+import { DevSignInButton } from "@/components/DevSignInButton";
 
 export const metadata: Metadata = {
   title: "Sign up",
@@ -26,6 +27,7 @@ export default function SignupPage() {
           </p>
           <div className="mt-7">
             <GoogleSignInButton />
+            <DevSignInButton />
           </div>
         </div>
       </main>
