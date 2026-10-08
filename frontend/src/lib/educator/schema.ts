@@ -4,9 +4,9 @@ import {
   Eligibility,
   EmploymentType,
   FacultyLevel,
-  HighestDegree,
   PhdStatus,
   UgcPayLevel,
+  HighestDegree,
 } from "@prisma/client";
 import { INDIAN_STATES } from "./constants";
 
