@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { Navbar } from "@/components/landing/Navbar";
 import { Footer } from "@/components/landing/Footer";
 import { auth } from "@/auth";
-import { prisma } from "@/lib/prisma";
 import { RolePickerForm } from "@/components/onboarding/RolePickerForm";
 
 export const metadata: Metadata = {
@@ -14,15 +13,15 @@ export default async function OnboardingPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { role: true },
-  });
-
+  // Role rides on the session — the Auth.js `session` callback copies it from
+  // the database user on every session read — so this gate needs no extra
+  // query. UNSET (or a session created before roles existed) shows the picker.
   // Roles are decided once; the minimal screen (/onboarding/educator/start)
   // is only reachable through setRole's redirect, so a returning user lands
   // straight in the product.
-  if (user && user.role !== "UNSET") redirect("/dashboard");
+  if (session.user.role && session.user.role !== "UNSET") {
+    redirect("/dashboard");
+  }
 
   return (
     <>

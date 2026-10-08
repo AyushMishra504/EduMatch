@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
@@ -37,6 +37,8 @@ type Profile = Awaited<ReturnType<typeof requireEducatorProfile>>;
  */
 async function done(step: number, intent: FormDataEntryValue | null = null): Promise<never> {
   revalidatePath("/onboarding/educator", "layout");
+  // The dashboard's cached profile read is tagged "profiles".
+  updateTag("profiles");
   if (intent === "exit") redirect("/dashboard");
   if (intent === "profile") redirect("/profile");
   if (step === 6) redirect("/dashboard?welcome=1");
@@ -80,6 +82,7 @@ export async function completeMinimalOnboarding(
     where: { id: profile.id },
     data: parsed.data,
   });
+  updateTag("profiles");
   redirect("/dashboard?welcome=1");
 }
 
@@ -262,5 +265,6 @@ export async function publishProfile(): Promise<ActionState> {
     },
   });
   revalidatePath("/dashboard");
+  updateTag("profiles");
   redirect("/dashboard?welcome=1");
 }

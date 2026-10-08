@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { unstable_cache } from "next/cache";
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
@@ -8,7 +9,11 @@ import { ProfileStatusCard } from "@/components/educator/ProfileStatusCard";
 import { ResumeImportCard } from "@/components/educator/ResumeImportCard";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { computeCompleteness } from "@/lib/educator/completeness";
+import {
+  computeCompleteness,
+  withRelationCounts,
+} from "@/lib/educator/completeness";
+import { maxReachableStep } from "@/lib/educator/wizard";
 import { signOutAction } from "./actions";
 
 export const metadata: Metadata = {
@@ -22,6 +27,31 @@ const ROLE_LABEL: Record<string, string> = {
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 
+/**
+ * Per-user dashboard data, keyed by user id and tagged `profiles`. Every
+ * profile write expires that tag (server actions use `updateTag`, the import
+ * route uses `revalidateTag`), so this can only be over-invalidated — it can
+ * never serve stale profile data — while skipping the account + profile
+ * queries on a repeat dashboard visit.
+ */
+const loadDashboardUser = unstable_cache(
+  async (userId: string) =>
+    prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        role: true,
+        name: true,
+        email: true,
+        image: true,
+        educatorProfile: {
+          include: { _count: { select: { education: true, experience: true } } },
+        },
+      },
+    }),
+  ["dashboard-user"],
+  { tags: ["profiles"] },
+);
+
 export default async function DashboardPage({
   searchParams,
 }: {
@@ -30,26 +60,35 @@ export default async function DashboardPage({
   const session = await auth();
   if (!session?.user) redirect("/login");
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { role: true, name: true, email: true, image: true },
-  });
+  // One query for the whole dashboard: role + account fields + profile scalars
+  // + relation COUNTS. `_count` replaces `include`, so Prisma skips one query
+  // per relation — the dashboard never needs the education/experience rows,
+  // only whether they exist (~530 ms saved on the remote DB). The read is
+  // cached per user and invalidated by the `profiles` tag on every write.
+  const user = await loadDashboardUser(session.user.id);
 
   if (!user || user.role === "UNSET") redirect("/onboarding");
 
   const params = searchParams ? await searchParams : undefined;
 
   let educatorBlock: React.ReactNode = null;
-  if (user.role === "EDUCATOR") {
-    const profile = await prisma.educatorProfile.findUnique({
-      where: { userId: session.user.id },
-      include: {
-        education: { orderBy: { sortOrder: "asc" } },
-        experience: { orderBy: { sortOrder: "asc" } },
-      },
-    });
-    if (profile) {
-      const { percent, missing } = computeCompleteness(profile);
+  let resumeHref: string | null = null;
+  const profile = user.educatorProfile;
+  if (user.role === "EDUCATOR" && profile) {
+    {
+      const completenessInput = withRelationCounts(profile, {
+        education: profile._count.education,
+        experience: profile._count.experience,
+      });
+      const { percent, missing } = computeCompleteness(completenessInput);
+      // Draft profiles get one unambiguous next action: resume the guided
+      // setup exactly where it stopped, never a generic "go to profile".
+      if (profile.visibility === "DRAFT") {
+        resumeHref = `/onboarding/educator/${maxReachableStep({
+          ...completenessInput,
+          visibility: profile.visibility,
+        })}`;
+      }
       const recentlyPublished =
         profile.publishedAt != null &&
         // eslint-disable-next-line react-hooks/purity
@@ -132,10 +171,18 @@ export default async function DashboardPage({
           </p>
         ) : null}
         {educatorBlock}
+        {resumeHref ? (
+          <Link
+            href={resumeHref}
+            className="mt-8 rounded-md bg-accent px-5 py-3 text-small font-semibold text-on-accent transition-colors hover:bg-accent-deep"
+          >
+            Continue your setup →
+          </Link>
+        ) : null}
         {params?.welcome === "1" && user.role === "EDUCATOR" ? (
           <Link
             href="/profile"
-            className="mt-8 rounded-md bg-accent px-5 py-3 text-small font-semibold text-on-accent transition-colors hover:bg-accent-deep"
+            className="mt-8 rounded-md border border-rule px-5 py-3 text-small font-semibold text-ink transition-colors hover:bg-paper-deep"
           >
             View profile
           </Link>

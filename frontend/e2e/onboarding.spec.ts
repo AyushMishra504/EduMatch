@@ -91,7 +91,7 @@ test("discipline + employment types land the user in the product", async ({
   ).toContainText("Full-time");
 });
 
-test("profile deep-links reach wizard steps (no skip-ahead redirect)", async ({
+test("profile deep-links to locked steps fall back to the furthest unlocked step", async ({
   page,
 }) => {
   await devSignIn(page);
@@ -103,9 +103,12 @@ test("profile deep-links reach wizard steps (no skip-ahead redirect)", async ({
   await expect(deepLink).toBeVisible();
   await deepLink.click();
 
-  await expect(page).toHaveURL(/\/onboarding\/educator\/5/);
+  // Guided progression: the freshly reset dev profile is an empty draft, so
+  // step 5 is still locked and the wizard opens at the first step instead of
+  // letting the user skip ahead.
+  await expect(page).toHaveURL(/\/onboarding\/educator\/1/);
   await expect(
-    page.getByRole("heading", { name: "What are you looking for?" }),
+    page.getByRole("heading", { name: "About you" }),
   ).toBeVisible();
 });
 

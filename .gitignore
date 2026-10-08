@@ -10,7 +10,6 @@ Thumbs.db
 out/
 dist/
 .eslintcache
-.md
 .chrome-cdp/
 cdp-repro*.js
 
@@ -22,3 +21,5 @@ resume-parser/**/__pycache__/
 
 # tooling metadata
 .freebuff/
+
+*.md

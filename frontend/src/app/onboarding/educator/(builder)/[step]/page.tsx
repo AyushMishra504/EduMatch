@@ -1,7 +1,7 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { requireEducatorWithUser } from "@/lib/educator/profile";
 import { TOTAL_STEPS } from "@/lib/educator/constants";
-import { wizardModeFor } from "@/lib/educator/wizard";
+import { maxReachableStep, wizardModeFor } from "@/lib/educator/wizard";
 import { Step1Basics } from "@/components/educator/steps/Step1Basics";
 import { Step2Academics } from "@/components/educator/steps/Step2Academics";
 import { Step3Experience } from "@/components/educator/steps/Step3Experience";
@@ -23,10 +23,14 @@ export default async function EducatorStepPage({
   const { profile, user } = await requireEducatorWithUser();
   const mode = wizardModeFor(profile.visibility);
 
-  // Any step 1..6 is always reachable. Deep-links from /profile and
-  // /dashboard ("Choose desired faculty levels" → step 5) depend on this —
-  // the old completedSteps guard silently redirected them to the wrong
-  // step. completedSteps is progress info only, never an access gate.
+  // Guided progression. Steps unlock in order: you cannot open a step past
+  // the first one whose required facts are still missing, so the setup reads
+  // as one path instead of a hop-anywhere editor. A deep link (or a stale
+  // back-button URL) past the frontier snaps to the first incomplete step.
+  // Completed steps stay editable, and published profiles are fully unlocked
+  // — `maxReachableStep` returns the final step for them.
+  const maxReachable = maxReachableStep(profile);
+  if (n > maxReachable) redirect(`/onboarding/educator/${maxReachable}`);
 
   switch (n) {
     case 1:

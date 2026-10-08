@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireEducatorProfile } from "@/lib/educator/profile";
@@ -29,6 +29,7 @@ export async function toggleVisibility(): Promise<VisibilityState | never> {
     });
     revalidatePath("/profile");
     revalidatePath("/dashboard");
+    updateTag("profiles");
     redirect("/profile");
   }
   const gaps = validateCanPublish(profile);
@@ -49,5 +50,6 @@ export async function toggleVisibility(): Promise<VisibilityState | never> {
   });
   revalidatePath("/profile");
   revalidatePath("/dashboard");
+  updateTag("profiles");
   redirect("/profile");
 }

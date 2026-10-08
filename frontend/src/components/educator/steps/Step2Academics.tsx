@@ -356,7 +356,7 @@ export function Step2Academics({
             dirty={dirty}
             showSaveExit={editing}
             showSaveProfile={editing}
-            showSkip={!editing}
+            showSkip={false}
           />
         </div>
       </form>

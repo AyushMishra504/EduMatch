@@ -1,5 +1,6 @@
 import { BuilderShell } from "@/components/educator/BuilderShell";
 import { requireEducatorProfile } from "@/lib/educator/profile";
+import { completedThrough, maxReachableStep } from "@/lib/educator/wizard";
 
 export default async function Layout({
   children,
@@ -12,7 +13,10 @@ export default async function Layout({
   // /dashboard, and save actions return published users to /profile.
   const profile = await requireEducatorProfile();
   return (
-    <BuilderShell completedSteps={profile.completedSteps}>
+    <BuilderShell
+      completedThrough={completedThrough(profile)}
+      maxReachable={maxReachableStep(profile)}
+    >
       {children}
     </BuilderShell>
   );

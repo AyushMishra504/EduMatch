@@ -47,13 +47,25 @@ const projectItemSchema = z.object({
   technologies: z.array(z.string()).default([]),
 });
 
+// The parser emits certification OBJECTS (schemas.py: CertificationItem). A
+// bare string is still accepted for forward/backward compatibility, but the
+// object form must not fail validation — that would reject the whole payload
+// and turn a readable resume into a 422.
+const certificationItemSchema = z.object({
+  name: z.string().nullish(),
+  issuer: z.string().nullish(),
+  date: z.string().nullish(),
+});
+
 export const profileImportSchema = z.object({
   personal: personalSchema.default({}),
   education: z.array(educationItemSchema).default([]),
   skills: z.array(z.string()).default([]),
   experience: z.array(experienceItemSchema).default([]),
   projects: z.array(projectItemSchema).default([]),
-  certifications: z.array(z.string()).default([]),
+  certifications: z
+    .array(z.union([z.string(), certificationItemSchema]))
+    .default([]),
   eligibilityHints: z.array(z.string()).default([]),
 });
 

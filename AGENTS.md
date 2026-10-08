@@ -40,9 +40,9 @@ npx prisma migrate dev   # after editing prisma/schema.prisma
 
 ## frontend architecture (non-obvious wiring)
 
-- `src/proxy.ts` = Next 16 middleware (renamed from `middleware.ts`). Matcher also covers `/profile/*`, but `isProtected` only redirects `/dashboard` + `/onboarding` — `/profile` is protected **page-level only** (by the gate), by design.
-- Auth: Auth.js v5, database sessions, `src/auth.ts`, cookie `authjs.session-token`. Google OAuth is the real login; dev-only bypass below.
-- Onboarding: role gate → **minimal `/onboarding/educator/start`** (discipline + employment types, or explicit "Skip for now" that writes nothing) → `/dashboard?welcome=1`. The 6-step wizard lives in `src/app/onboarding/educator/(builder)/[step]/page.tsx` (`force-dynamic`; **free navigation** — skip-ahead guard removed; wizard = profile editor, entered via deep links from dashboard/profile). Footer intents (`done(step, intent)`): no intent = next step, `exit` = dashboard, `profile` = `/profile`; step 5's "Any" levels card saves `desiredLevels=[]` (widest match estimate; levels never block publish — `requiredGaps` gates types/locations instead), shared `layout.tsx` renders `BuilderShell`, actions in `actions.ts`. `MinimalOnboardingForm` mirrors edits to sessionStorage (`edumatch.minimalOnboarding.v1`) so Back never loses input.
+- `src/proxy.ts` = Next 16 middleware (renamed from `middleware.ts`). It is a **cheap cookie-presence check** — no NextAuth/DB work at the edge — that redirects `/dashboard`, `/onboarding`, and `/profile` to `/login` when no session cookie is present. The page gates (`requireEducatorProfile` / the dashboard's own `auth()` + role check) remain the authoritative validation.
+- Auth: Auth.js v5, database sessions, `src/auth.ts`, cookie `authjs.session-token`. Two real providers: **Google OAuth** and **email magic link** (custom `type:"email"` provider; `VerificationToken` Prisma model). With no `EMAIL_SERVER_*` env in dev the magic link is logged to the server console; production requires `EMAIL_SERVER_HOST` or sending throws. The `/login` + `/signup` pages are the Stitch "3D Flip Auth" design (`src/components/auth/AuthScreen.tsx`, dark Academic Night palette) with a dev-only bypass below.
+- Onboarding: role gate → **minimal `/onboarding/educator/start`** (discipline + employment types, or explicit "Skip for now" that writes nothing) → `/dashboard?welcome=1`. The 6-step wizard lives in `src/app/onboarding/educator/(builder)/[step]/page.tsx` (`force-dynamic`). It uses **guided progression**, not free navigation: `maxReachableStep(profile)` (`src/lib/educator/wizard.ts`) unlocks steps in order, `completedThrough` derives progress from data validity (not a visited counter), required steps offer no "Skip", and published profiles are fully unlocked for editing. Future steps are locked in `BuilderShell`, and the dashboard deep-links to the exact resume step. Footer intents (`done(step, intent)`): no intent = next step, `exit` = dashboard, `profile` = `/profile`; step 5's "Any" levels card saves `desiredLevels=[]` (widest match estimate; levels never block publish — `requiredGaps` gates types/locations instead), shared `layout.tsx` renders `BuilderShell`, actions in `actions.ts`. `MinimalOnboardingForm` mirrors edits to sessionStorage (`edumatch.minimalOnboarding.v1`) so Back never loses input.
 - Playwright baseURL must be `http://localhost:3000` — Next dev blocks `/_next/*` dev resources for the `127.0.0.1` origin, so React never hydrates there (clicks silently do nothing).
 - **Server-action convention**: mutating actions must end in `redirect()` (or return *before* writing). The gate is React-cached per request — returning an `ActionState` after a write would re-render with stale profile data. Validation-failure paths must return before any write.
 - Dev-only skip-login: `src/app/dev/actions.ts` + `src/components/DevSignInButton.tsx` — **delete both before launch** (hard-blocked when `NODE_ENV=production`).
@@ -53,3 +53,11 @@ npx prisma migrate dev   # after editing prisma/schema.prisma
 - `frontend/CLAUDE.md` → just `@AGENTS.md` (the generated one).
 - `PROJECT_STATUS.md` — authoritative current-state doc (features, gaps, run instructions, flow diagram). Trust it over `revamp.md` when they conflict.
 - `revamp.md` — design/copy spec, not current state.
+
+## Review pass (2026-10-07)
+
+- `REPO_REVIEW.md` — repo review, ranked findings, and implementation status.
+- `DEPLOYMENT.md` — service-boundary decision (Next = BFF, `backend/` reserved, parser separate) + Docker/compose usage.
+- `contracts/parser-profile-fields.json` — frozen parser↔frontend field contract; both sides have a test against it.
+- `frontend/package.json` → `npm run check:env` catches a `prisma/.env` vs `.env.local` `DATABASE_URL` mismatch before migrations hit the wrong database.
+- CI additionally runs the `resume-parser` pytest suite (needs no Docling).

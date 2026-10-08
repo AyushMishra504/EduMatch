@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
+import { logEvent } from "@/lib/log";
 import {
   applyResumeImport,
   parserResponseSchema,
@@ -16,10 +18,20 @@ const ALLOWED_EXTENSIONS = new Set([".pdf", ".docx"]);
 // deployment should move this to Redis/DB.
 const RATE_LIMIT_MAX = 5;
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+// Opportunistic sweep threshold — without it, a user who uploads once and
+// never returns leaks a permanent entry.
+const RATE_LIMIT_SWEEP_AT = 10_000;
 const attempts = new Map<string, number[]>();
 
 function isRateLimited(userId: string): boolean {
   const now = Date.now();
+  if (attempts.size > RATE_LIMIT_SWEEP_AT) {
+    for (const [key, times] of attempts) {
+      if (times.every((t) => now - t >= RATE_LIMIT_WINDOW_MS)) {
+        attempts.delete(key);
+      }
+    }
+  }
   const recent = (attempts.get(userId) ?? []).filter(
     (t) => now - t < RATE_LIMIT_WINDOW_MS,
   );
@@ -54,32 +66,17 @@ function fail(
  * Multipart `file` → internal parser → Zod-validated ProfileImport →
  * fill-only-empty merge in one Prisma transaction. The uploaded file is
  * never persisted; only the extracted fields (and the filename) are kept.
+ *
+ * Ordering matters: cheap file validation happens before any database work
+ * (bad input never costs a roundtrip), and account + profile + relations are
+ * fetched in a single query rather than two.
  */
 export async function POST(req: Request) {
+  const requestId = crypto.randomUUID();
+  const startedAt = Date.now();
   const session = await auth();
   if (!session?.user) {
     return fail(401, "UNAUTHENTICATED", "Please sign in to upload a resume.");
-  }
-
-  // Server is authoritative: role + profile come from the session/DB, never
-  // from client-provided IDs (§20, §40).
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { id: true, role: true, name: true },
-  });
-  if (!user || user.role !== "EDUCATOR") {
-    return fail(403, "FORBIDDEN", "Resume import is available for educators.");
-  }
-
-  let profile = await prisma.educatorProfile.findUnique({
-    where: { userId: user.id },
-    include: { education: true, experience: true },
-  });
-  if (!profile) {
-    profile = await prisma.educatorProfile.create({
-      data: { userId: user.id },
-      include: { education: true, experience: true },
-    });
   }
 
   let form: FormData;
@@ -109,7 +106,7 @@ export async function POST(req: Request) {
     return fail(413, "FILE_TOO_LARGE", "Resume is too large (max 5 MB).");
   }
 
-  if (isRateLimited(user.id)) {
+  if (isRateLimited(session.user.id)) {
     return fail(
       429,
       "RATE_LIMITED",
@@ -117,18 +114,54 @@ export async function POST(req: Request) {
     );
   }
 
+  // Server is authoritative: role + profile come from the session/DB, never
+  // from client-provided IDs (§20, §40). One query covers account + profile +
+  // both relations.
+  const account = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: {
+      id: true,
+      role: true,
+      name: true,
+      educatorProfile: { include: { education: true, experience: true } },
+    },
+  });
+  if (!account || account.role !== "EDUCATOR") {
+    return fail(403, "FORBIDDEN", "Resume import is available for educators.");
+  }
+
+  // `upsert` (not `create`) so two concurrent first uploads cannot collide on
+  // the unique `userId` constraint.
+  const profile =
+    account.educatorProfile ??
+    (await prisma.educatorProfile.upsert({
+      where: { userId: account.id },
+      create: { userId: account.id },
+      update: {},
+      include: { education: true, experience: true },
+    }));
+
   // Forward to the internal parser (§18.6). It knows nothing about the user.
+  // The request id travels with the upload so a failure can be traced across
+  // both services.
   let parserBody: unknown;
   try {
     const forward = new FormData();
     forward.append("file", file, filename);
     const response = await fetch(`${parserBaseUrl()}/parse`, {
       method: "POST",
+      headers: { "x-request-id": requestId },
       body: forward,
       signal: AbortSignal.timeout(120_000),
     });
     parserBody = await response.json();
   } catch {
+    logEvent("resume_import", {
+      requestId,
+      userId: account.id,
+      status: "PARSER_UNAVAILABLE",
+      ms: Date.now() - startedAt,
+    });
     return fail(
       502,
       "PARSER_UNAVAILABLE",
@@ -155,7 +188,7 @@ export async function POST(req: Request) {
 
   const result = applyResumeImport(
     {
-      userName: user.name,
+      userName: account.name,
       phone: profile.phone,
       city: profile.city,
       state: profile.state,
@@ -188,20 +221,20 @@ export async function POST(req: Request) {
     await prisma.$transaction(async (tx) => {
       if (result.userPatch.name) {
         await tx.user.update({
-          where: { id: user.id },
+          where: { id: account.id },
           data: { name: result.userPatch.name },
         });
       }
       if (Object.keys(profileScalars).length > 0) {
         await tx.educatorProfile.update({
-          where: { id: profile!.id },
+          where: { id: profile.id },
           data: profileScalars,
         });
       }
       if (result.newEducation.length > 0) {
         await tx.educationEntry.createMany({
           data: result.newEducation.map((row, index) => ({
-            profileId: profile!.id,
+            profileId: profile.id,
             degree: row.degree,
             field: row.field,
             institution: row.institution,
@@ -216,7 +249,7 @@ export async function POST(req: Request) {
       if (result.newExperience.length > 0) {
         await tx.experienceEntry.createMany({
           data: result.newExperience.map((row, index) => ({
-            profileId: profile!.id,
+            profileId: profile.id,
             designation: row.designation,
             institution: row.institution,
             startYear: row.startYear,
@@ -231,12 +264,30 @@ export async function POST(req: Request) {
       }
     });
   } catch {
+    logEvent("resume_import", {
+      requestId,
+      userId: account.id,
+      status: "IMPORT_FAILED",
+      ms: Date.now() - startedAt,
+    });
     return fail(
       500,
       "IMPORT_FAILED",
       "We couldn't save the extracted details. You can enter them manually.",
     );
   }
+
+  // The dashboard caches its profile read under this tag. (Route handlers
+  // cannot call `updateTag`, so expire the tag explicitly instead.)
+  revalidateTag("profiles", { expire: 0 });
+
+  logEvent("resume_import", {
+    requestId,
+    userId: account.id,
+    status: "OK",
+    filled: result.filled.length,
+    ms: Date.now() - startedAt,
+  });
 
   return NextResponse.json({
     success: true,

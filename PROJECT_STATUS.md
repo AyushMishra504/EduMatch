@@ -1,7 +1,9 @@
 # EduMatch — Project Status & Architecture
 
 > Generated: 2026-09-30
-> Branch: `main` — dirty tree (uncommitted educator-profile work)
+> Branch: `main`
+>
+> **Update 2026-10-07:** the educator vertical, resume parser, and docs are now committed. A full repo review (`REPO_REVIEW.md`) was completed and its fixes implemented in the following pass — a guided (locked-step) wizard, dashboard latency work, a `resume-parser` CI job, a frozen parser↔frontend contract, and Docker/deploy config (`DEPLOYMENT.md`). Sections below predate that pass; see `REPO_REVIEW.md` section 9 for exactly what changed, and note the wizard is no longer "free navigation".
 > Commits on HEAD (7): `Initial commit` → `ci + /health` → `theme switch` → `landing edits` → `Google OAuth` → `theme toggle` → `fix: sync package lock`
 > Uncommitted vs HEAD: all educator-vertical work plus the **Minimal Onboarding UX revamp** (new `/onboarding/educator/start` screen, wizard moved to route group `(builder)` with free navigation, dashboard/profile pressure-free copy + `PriorityImprovementsCard`, Vitest unit suite + Playwright E2E, CI unit-test step). This doc itself (`PROJECT_STATUS.md`, repo root) is untracked.
 > Scope of this doc: everything currently in `frontend/` + `backend/` + `prisma/` + CI, **including uncommitted work**.

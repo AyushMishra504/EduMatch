@@ -17,6 +17,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from starlette.concurrency import run_in_threadpool
 
 from app import __version__
 from app.docling_service import (
@@ -140,9 +141,14 @@ async def parse_resume(request: Request) -> JSONResponse:
 
     try:
         source_format = _validate_bytes(filename, data).lstrip(".")
-        outcome = convert_bytes(filename, data)
+        # Conversion + extraction are CPU-bound and must not run on the event
+        # loop, or concurrent uploads serialize and /health stops answering
+        # mid-parse. Hand them to the threadpool (bounded inside the service).
+        outcome = await run_in_threadpool(convert_bytes, filename, data)
         ocr_used = outcome.ocr_used
-        profile, warnings = extract_from_document(outcome.document)
+        profile, warnings = await run_in_threadpool(
+            extract_from_document, outcome.document
+        )
     except ParseError as exc:
         status = exc.code
         _log(request_id, filename, len(data), ocr_used, started, status)

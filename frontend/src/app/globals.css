@@ -53,6 +53,10 @@
   transform-style: preserve-3d;
 }
 
+@utility backface-hidden {
+  backface-visibility: hidden;
+}
+
 @utility perspective-1200 {
   perspective: 1200px;
 }

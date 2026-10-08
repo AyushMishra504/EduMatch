@@ -136,13 +136,24 @@ def build_ocr_converter():
 
 _fast_converter = None
 _ocr_converter = None
+_fast_lock = threading.Lock()
 _ocr_lock = threading.Lock()
+
+# Bound how many CPU-heavy conversions run at once. Callers hand work to the
+# threadpool (see main.py), so the event loop stays free, but unbounded
+# parallel ONNX inference would still thrash the box. Override with
+# PARSER_MAX_CONCURRENCY.
+MAX_CONCURRENCY = max(1, int(os.environ.get("PARSER_MAX_CONCURRENCY", "2")))
+_convert_slots = threading.BoundedSemaphore(MAX_CONCURRENCY)
 
 
 def get_fast_converter():
+    """Double-checked so two cold-start requests can never build twice."""
     global _fast_converter
     if _fast_converter is None:
-        _fast_converter = build_fast_converter()
+        with _fast_lock:
+            if _fast_converter is None:
+                _fast_converter = build_fast_converter()
     return _fast_converter
 
 
@@ -188,7 +199,16 @@ def needs_ocr(text: str) -> bool:
 
 
 def convert_bytes(filename: str, data: bytes) -> ConversionOutcome:
-    """Fast pass first; OCR pass only when the text looks unusable."""
+    """Fast pass first; OCR pass only when the text looks unusable.
+
+    Blocking by design — callers offload this to the threadpool — and bounded
+    by ``_convert_slots`` so only MAX_CONCURRENCY conversions run at once.
+    """
+    with _convert_slots:
+        return _convert_bytes(filename, data)
+
+
+def _convert_bytes(filename: str, data: bytes) -> ConversionOutcome:
     try:
         result = _convert(get_fast_converter(), filename, data)
         text = result.document.export_to_text()

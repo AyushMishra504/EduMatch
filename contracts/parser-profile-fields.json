@@ -1,0 +1,11 @@
+{
+  "$comment": "Frozen field-name contract shared by the resume parser (resume-parser/app/schemas.py) and the frontend import layer (frontend/src/lib/educator/resume-import.ts). Both sides have a test that compares their schema against these lists, so a field renamed on one side without the other fails CI. Update this file deliberately, never incidentally.",
+  "personal": ["name", "email", "phone", "location", "linkedin", "github", "portfolio", "orcid"],
+  "educationItem": ["institution", "degree", "field", "startDate", "endDate", "grade"],
+  "experienceItem": ["company", "role", "startDate", "endDate", "description"],
+  "projectItem": ["name", "description", "technologies"],
+  "certificationItem": ["name", "issuer", "date"],
+  "profile": ["personal", "education", "skills", "experience", "projects", "certifications", "eligibilityHints"],
+  "meta": ["ocrUsed", "sourceFormat", "processingTimeMs", "warnings"],
+  "parseResponse": ["success", "profile", "meta"]
+}

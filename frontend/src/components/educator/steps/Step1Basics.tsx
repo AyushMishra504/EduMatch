@@ -318,7 +318,7 @@ export function Step1Basics({
             dirty={dirty}
             showSaveExit={editing}
             showSaveProfile={editing}
-            showSkip={!editing}
+            showSkip={false}
           />
         </div>
       </form>

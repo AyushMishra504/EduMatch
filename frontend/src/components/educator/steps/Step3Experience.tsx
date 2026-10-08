@@ -332,7 +332,7 @@ export function Step3Experience({
             dirty={dirty}
             showSaveExit={editing}
             showSaveProfile={editing}
-            showSkip={!editing}
+            showSkip={false}
             skipLabel={
               hasExperience === null ? "Skip — I'll do this later" : "Skip for now"
             }

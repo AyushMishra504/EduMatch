@@ -1,15 +1,18 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireEducatorProfile } from "@/lib/educator/profile";
-import { STEPS, TOTAL_STEPS } from "@/lib/educator/constants";
+import { STEPS } from "@/lib/educator/constants";
 import { computeCompleteness } from "@/lib/educator/completeness";
+import { maxReachableStep } from "@/lib/educator/wizard";
 import { skipStep4 } from "../actions";
 
 export default async function EducatorOnboarding() {
   const profile = await requireEducatorProfile();
   if (profile.visibility === "PUBLISHED") redirect("/dashboard");
 
-  const next = Math.min(profile.completedSteps + 1, TOTAL_STEPS);
+  // Resume at the first step that still needs work — same frontier the step
+  // guard enforces, so this interstitial can never point past a locked step.
+  const next = maxReachableStep(profile);
   // Fresh profiles skip the resume interstitial — they come back through
   // /dashboard (role gate) or /onboarding/educator/start (first run).
   if (profile.completedSteps === 0) redirect("/dashboard");
