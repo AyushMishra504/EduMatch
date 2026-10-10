@@ -19,8 +19,12 @@ export default async function OnboardingPage() {
   // Roles are decided once; the minimal screen (/onboarding/educator/start)
   // is only reachable through setRole's redirect, so a returning user lands
   // straight in the product.
-  if (session.user.role && session.user.role !== "UNSET") {
+  if (session.user.role === "EDUCATOR") {
     redirect("/dashboard");
+  }
+
+  if (session.user.role === "INSTITUTION") {
+    redirect("/institution/dashboard");
   }
 
   return (

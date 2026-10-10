@@ -1,10 +1,17 @@
+
 import type { Metadata } from "next";
 import { Navbar } from "@/components/landing/Navbar";
 import { Hero } from "@/components/landing/Hero";
+import {
+  MarqueeTop,
+  MarqueeBottom,
+} from "@/components/landing/Marquee";
+import { ForEducators } from "@/components/landing/ForEducators";
+import { ForInstitutions } from "@/components/landing/ForInstitutions";
 import { HowItWorks } from "@/components/landing/HowItWorks";
-import { SampleMatches } from "@/components/landing/SampleMatches";
-import { Faq } from "@/components/landing/Faq";
-import { Join } from "@/components/landing/Join";
+import { ComparisonTable } from "@/components/landing/ComparisonTable";
+import { MatchSimulator } from "@/components/landing/MatchSimulator";
+import { FloatingChatbot } from "@/components/landing/FloatingChatbot";
 import { Footer } from "@/components/landing/Footer";
 
 export const metadata: Metadata = {
@@ -16,22 +23,18 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <>
-      {/* The scroll reveals are progressive enhancement only — without JS every
-          section renders immediately in its final state. */}
-      <noscript
-        dangerouslySetInnerHTML={{
-          __html:
-            '<style>[data-reveal="out"]{opacity:1 !important;transform:none !important}</style>',
-        }}
-      />
       <Navbar />
       <main>
         <Hero />
+        <MarqueeTop />
+        <ForEducators />
+        <MarqueeBottom />
+        <ForInstitutions />
         <HowItWorks />
-        <SampleMatches />
-        <Faq />
-        <Join />
+        <ComparisonTable />
+        <MatchSimulator />
       </main>
+      <FloatingChatbot />
       <Footer />
     </>
   );

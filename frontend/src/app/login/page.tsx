@@ -27,6 +27,8 @@ export default async function LoginPage({
             ? "email"
             : error === "send"
               ? "send"
+              : error === "OAuthAccountNotLinked"
+                ? "google-account-linked"
               : undefined
       }
     />

@@ -1,3 +1,4 @@
+
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -33,6 +34,7 @@
   --text-tiny: 0.8125rem;
   --text-tiny--line-height: 1.5;
 
+  /* Existing animations */
   --animate-marquee: marquee 26s linear infinite;
   --animate-float: float 7s ease-in-out infinite;
   --animate-caret: caret-blink 0.95s steps(2, start) infinite;
@@ -41,14 +43,30 @@
   --animate-pop: pop-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
   --animate-sweep: sweep 14s ease-in-out infinite;
 
+  /* Landing-page animations */
+  --animate-marquee-reverse: marquee-reverse 34s linear infinite;
+  --animate-slide-up: slide-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-fade-scale-in: fade-scale-in 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-slide-in-left: slide-in-left 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-slide-in-right: slide-in-right 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-shimmer: shimmer 2.4s linear infinite;
+  --animate-orb-drift: orb-drift 12s ease-in-out infinite;
+  --animate-orb-drift-slow: orb-drift-slow 18s ease-in-out infinite alternate;
+  --animate-nav-slide-down: nav-slide-down 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-stat-pop: stat-pop 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  /* Existing shadows */
   --shadow-card: 0 1px 2px rgb(27 30 26 / 0.05),
     0 10px 24px -12px rgb(27 30 26 / 0.14);
   --shadow-card-lg: 0 2px 4px rgb(27 30 26 / 0.06),
     0 24px 48px -16px rgb(27 30 26 / 0.22);
   --shadow-glow: 0 0 0 1px color-mix(in srgb, var(--color-accent) 40%, transparent),
     0 12px 40px -8px color-mix(in srgb, var(--color-accent) 45%, transparent);
+  --shadow-glow-sm: 0 0 0 1px color-mix(in srgb, var(--color-accent) 25%, transparent),
+    0 6px 20px -4px color-mix(in srgb, var(--color-accent) 30%, transparent);
 }
 
+/* Existing 3D and visual utilities */
 @utility preserve-3d {
   transform-style: preserve-3d;
 }
@@ -79,11 +97,19 @@
   -webkit-backdrop-filter: blur(14px);
 }
 
+/* Landing-page dot-grid utility */
+@utility dot-grid {
+  background-image: radial-gradient(var(--color-rule) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Existing keyframes */
 @keyframes float {
   0%,
   100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-8px);
   }
@@ -100,6 +126,7 @@
     opacity: 0;
     transform: translateY(4px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -117,6 +144,7 @@
     opacity: 0;
     transform: translateY(20px) scale(0.98);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -128,10 +156,12 @@
     opacity: 0;
     transform: scale(0.82);
   }
+
   60% {
     opacity: 1;
     transform: scale(1.05);
   }
+
   100% {
     opacity: 1;
     transform: scale(1);
@@ -144,13 +174,139 @@
     opacity: 0.75;
     transform: translate3d(0, 0, 0) scale(1);
   }
+
   50% {
     opacity: 1;
     transform: translate3d(2%, -3%, 0) scale(1.06);
   }
 }
 
-/* Landing-page textures adapted from the Stitch redesign. */
+/* Landing-page keyframes */
+@keyframes marquee-reverse {
+  from {
+    transform: translateX(-50%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-32px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(32px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes orb-drift {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  33% {
+    transform: translate(18px, -22px) scale(1.05);
+  }
+
+  66% {
+    transform: translate(-14px, 10px) scale(0.97);
+  }
+
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+@keyframes orb-drift-slow {
+  0% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+
+  50% {
+    transform: translate(-22px, 16px) scale(1.07) rotate(8deg);
+  }
+
+  100% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 200% center;
+  }
+
+  to {
+    background-position: -200% center;
+  }
+}
+
+@keyframes nav-slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes stat-pop {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Landing-page textures adapted from the Stitch redesign */
 .hero-dot-grid {
   background-image: radial-gradient(
     color-mix(in srgb, var(--color-ink) 14%, transparent) 1px,
@@ -159,8 +315,7 @@
   background-size: 24px 24px;
 }
 
-/* Scroll reveal — toggled by the <Reveal> component so the content is never
-   hidden behind a scroll-driven animation, and stays visible without JS. */
+/* Existing scroll reveal */
 [data-reveal] {
   transition:
     opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
@@ -177,7 +332,7 @@
   transform: translateY(0);
 }
 
-/* Soft mint aurora behind the hero, matching the Stitch artwork. */
+/* Soft mint aurora behind the hero */
 .hero-aurora {
   background:
     linear-gradient(
@@ -216,6 +371,59 @@
   transform: translateY(-4px);
 }
 
+/* Landing-page helper styles */
+[data-inview] {
+  opacity: 0;
+}
+
+[data-inview].in-view {
+  opacity: 1;
+}
+
+[data-inview="slide-up"].in-view {
+  animation: var(--animate-slide-up);
+}
+
+[data-inview="fade-scale"].in-view {
+  animation: var(--animate-fade-scale-in);
+}
+
+[data-inview="slide-left"].in-view {
+  animation: var(--animate-slide-in-left);
+}
+
+[data-inview="slide-right"].in-view {
+  animation: var(--animate-slide-in-right);
+}
+
+.shimmer-text {
+  background: linear-gradient(
+    90deg,
+    var(--color-ink) 0%,
+    var(--color-accent) 30%,
+    color-mix(in srgb, var(--color-accent) 70%, #22d3b8) 50%,
+    var(--color-accent) 70%,
+    var(--color-ink) 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: var(--animate-shimmer);
+}
+
+.card-lift {
+  transition:
+    transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.2s ease;
+}
+
+.card-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-card-lg);
+}
+
 :root {
   color-scheme: light;
 }
@@ -231,6 +439,24 @@
   --color-accent-deep: #186556;
   --color-accent-tint: #0e1412;
   --color-on-accent: #e8f5f2;
+}
+
+/* Preserve institution vacancy form autofill and dropdown styling */
+.institution-vacancy-form input:-webkit-autofill,
+.institution-vacancy-form input:-webkit-autofill:hover,
+.institution-vacancy-form input:-webkit-autofill:focus,
+.institution-vacancy-form textarea:-webkit-autofill,
+.institution-vacancy-form textarea:-webkit-autofill:hover,
+.institution-vacancy-form textarea:-webkit-autofill:focus,
+.institution-vacancy-form select:-webkit-autofill {
+  -webkit-text-fill-color: var(--color-ink);
+  -webkit-box-shadow: 0 0 0 1000px var(--color-paper-deep) inset;
+  caret-color: var(--color-ink);
+}
+
+.institution-vacancy-select option {
+  background-color: var(--color-paper-deep);
+  color: var(--color-ink);
 }
 
 html {
@@ -260,8 +486,7 @@ body {
 
 ::view-transition-new(root) {
   z-index: 2;
-  /* Hidden until the reveal animation starts — prevents a flash of the new
-     theme while Chrome asynchronously runs the update callback. */
+  /* Hidden until the reveal animation starts */
   clip-path: circle(0px at 50% 50%);
 }
 
@@ -271,17 +496,29 @@ body {
   ::view-transition-new(*) {
     animation: none !important;
   }
+
   *,
   *::before,
   *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
-  /* Entrance animations are decorative only — never gate the content behind
-     them when a visitor asks for reduced motion. */
+
+  /* Entrance animations are decorative only */
   [class*="animate-"] {
     animation: none !important;
     animation-timeline: auto !important;
+  }
+
+  [data-inview] {
+    opacity: 1 !important;
+    animation: none !important;
+  }
+
+  .shimmer-text {
+    animation: none;
+    -webkit-text-fill-color: var(--color-ink);
+    background: none;
   }
 }
 
@@ -290,11 +527,12 @@ html.theme-transition,
 html.theme-transition *,
 html.theme-transition *::before,
 html.theme-transition *::after {
-  transition: background-color 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-              color 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-              fill 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-              stroke 0.5s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  transition:
+    background-color 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    color 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    fill 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    stroke 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1) !important;
   transition-delay: 0s !important;
 }

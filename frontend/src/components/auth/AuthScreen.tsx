@@ -255,7 +255,7 @@ function Banner({
   kind,
   email,
 }: {
-  kind: "sent" | "email" | "send";
+  kind: "sent" | "email" | "send" | "google-account-linked";
   email?: string;
 }) {
   if (kind === "sent") {
@@ -293,7 +293,9 @@ function Banner({
     >
       {kind === "email"
         ? "Please enter a valid email address."
-        : "We couldn't send the sign-in email right now. Please try again, or continue with Google."}
+        : kind === "google-account-linked"
+          ? "We couldn't safely match this Google sign-in to your EduMatch account. This can happen if the Google identity is linked to another EduMatch user or if its email is already associated with an account. To protect your profile, sign in using a method already associated with your intended account or request an account-ownership review. No account links or profile records were changed."
+          : "We couldn't send the sign-in email right now. Please try again, or continue with Google."}
     </div>
   );
 }
@@ -438,7 +440,7 @@ export function AuthScreen({
 }: {
   initialMode?: Mode;
   sentEmail?: string;
-  errorKind?: "sent" | "email" | "send";
+  errorKind?: "sent" | "email" | "send" | "google-account-linked";
 }) {
   const [mode, setMode] = useState<Mode>(initialMode);
   const flipped = mode === "register";

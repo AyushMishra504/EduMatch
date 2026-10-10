@@ -92,6 +92,12 @@ enum UgcPayLevel {
   NEGOTIABLE
 }
 
+enum VacancyStatus {
+  DRAFT
+  PUBLISHED
+  CLOSED
+}
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -105,6 +111,7 @@ model User {
   accounts Account[]
   sessions Session[]
   educatorProfile EducatorProfile?
+  institutionProfile InstitutionProfile?
 }
 
 model EducatorProfile {
@@ -146,6 +153,49 @@ model EducatorProfile {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   @@index([visibility, discipline])
+}
+
+model InstitutionProfile {
+  id String @id @default(cuid())
+  userId String @unique
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name String?
+  website String?
+  city String?
+  state String?
+  description String?
+  institutionType String?
+  contactName String?
+  contactEmail String?
+  phone String?
+  visibility ProfileVisibility @default(DRAFT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  jobOpenings JobOpening[]
+
+  @@index([visibility, city])
+}
+
+model JobOpening {
+  id String @id @default(cuid())
+  institutionProfileId String
+  institutionProfile InstitutionProfile @relation(fields: [institutionProfileId], references: [id], onDelete: Cascade)
+
+  title String
+  department String?
+  location String?
+  employmentType EmploymentType?
+  discipline Discipline?
+  facultyLevel FacultyLevel?
+  description String?
+  requirements String?
+  status VacancyStatus @default(DRAFT)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([institutionProfileId, status])
 }
 
 model EducationEntry {
